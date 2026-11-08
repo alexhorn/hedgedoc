@@ -18,6 +18,8 @@ backups/
 
 # ignore config files
 config.json
+# ... except the (empty) one of the docker image
+!/docker/config.json
 .sequelizerc
 
 # ignore webpack build

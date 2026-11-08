@@ -1,0 +1,16 @@
+# Keep the build context small and the build reproducible: everything here is either
+# created by the build itself or not needed to run HedgeDoc.
+.git
+.github
+.yarn/cache
+.yarn/install-state.gz
+node_modules
+public/build
+public/views/build
+public/uploads/*
+!public/uploads/.gitkeep
+config.json
+.sequelizerc
+*.sqlite
+*.log
+docs
