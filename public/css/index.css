@@ -80,9 +80,13 @@ body:not(.night) .night {
     letter-spacing: normal;
     line-height: normal;
 }
+/* The themes draw a border around the panels. The height of the scroller is calculated from
+   the heights of the tool bar and the status bar (see checkEditorStyle), so a border would make
+   the editor taller than its area and the page would scroll. The !important is needed to win
+   against the more specific rules of the theme. */
 .CodeMirror .cm-panels-top,
 .CodeMirror .cm-panels-bottom {
-    border: none;
+    border-width: 0 !important;
 }
 .CodeMirror .cm-panels > .cm-panel {
     padding: 0;
