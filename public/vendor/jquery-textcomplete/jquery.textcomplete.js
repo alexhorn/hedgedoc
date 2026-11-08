@@ -864,31 +864,15 @@ if (typeof jQuery === 'undefined') {
     //
     // FIXME: Calculate the left top corner of `this.option.appendTo` element.
     getCaretPosition: function () {
-      if ($('.CodeMirror-cursor').length > 0) {
-        var position = $('.CodeMirror-cursor').position();
-        var menu = $('.cursor-menu .dropdown-menu');
-        var offsetLeft = parseFloat(menu.attr('data-offset-left'));
-        var offsetTop = parseFloat(menu.attr('data-offset-top'));
-        position.left += offsetLeft;
-        position.top += offsetTop;
-        return position;
-      } else {
-        var position = this._getCaretRelativePosition();
-        var offset = this.$el.offset();
-
-        // Calculate the left top corner of `this.option.appendTo` element.
-        var $parent = this.option.appendTo;
-        if ($parent) {
-          if (!($parent instanceof $)) { $parent = $($parent); }
-          var parentOffset = $parent.offsetParent().offset();
-          offset.top -= parentOffset.top;
-          offset.left -= parentOffset.left;
-        }
-
-        position.top += offset.top;
-        position.left += offset.left;
-        return position;
-      }
+      // the position is relative to the overlay the menu lives in, see lib/editor/view.js
+      var position = editor.charCoords(editor.getCursor(), 'windows');
+      var menu = $('.cursor-menu .dropdown-menu');
+      var offsetLeft = parseFloat(menu.attr('data-offset-left')) || 0;
+      var offsetTop = parseFloat(menu.attr('data-offset-top')) || 0;
+      return {
+        left: position.left + offsetLeft,
+        top: position.top + offsetTop
+      };
     },
 
     // Focus on the element.
@@ -1056,8 +1040,11 @@ if (typeof jQuery === 'undefined') {
       }
     })($),
 
+    // The input field of the editor is not a real textarea (it has no value), so the
+    // text before the caret is taken from the editor.
     getTextFromHeadToCaret: function () {
-      return this.el.value.substring(0, this.el.selectionEnd);
+      var cursor = editor.getCursor();
+      return editor.getLine(cursor.line).slice(0, cursor.ch);
     }
   });
 

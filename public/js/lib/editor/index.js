@@ -1,90 +1,9 @@
-/* global CodeMirror, inlineAttachment, editor, Cookies  */
-import '@hedgedoc/codemirror-5/addon/comment/comment.js'
-import '@hedgedoc/codemirror-5/addon/comment/continuecomment.js'
-import '@hedgedoc/codemirror-5/addon/dialog/dialog.js'
-import '@hedgedoc/codemirror-5/addon/display/autorefresh.js'
-import '@hedgedoc/codemirror-5/addon/display/fullscreen.js'
-import '@hedgedoc/codemirror-5/addon/display/panel.js'
-import '@hedgedoc/codemirror-5/addon/display/placeholder.js'
-import '@hedgedoc/codemirror-5/addon/edit/closebrackets.js'
-import '@hedgedoc/codemirror-5/addon/edit/closetag.js'
-import '@hedgedoc/codemirror-5/addon/edit/continuelist.js'
-import '@hedgedoc/codemirror-5/addon/edit/matchbrackets.js'
-import '@hedgedoc/codemirror-5/addon/edit/matchtags.js'
-import '@hedgedoc/codemirror-5/addon/fold/brace-fold.js'
-import '@hedgedoc/codemirror-5/addon/fold/foldcode.js'
-import '@hedgedoc/codemirror-5/addon/fold/foldgutter.js'
-import '@hedgedoc/codemirror-5/addon/fold/markdown-fold.js'
-import '@hedgedoc/codemirror-5/addon/fold/xml-fold.js'
-import '@hedgedoc/codemirror-5/addon/merge/merge.js'
-import '@hedgedoc/codemirror-5/addon/mode/multiplex.js'
-import '@hedgedoc/codemirror-5/addon/mode/overlay.js'
-import '@hedgedoc/codemirror-5/addon/mode/simple.js'
-import '@hedgedoc/codemirror-5/addon/scroll/annotatescrollbar.js'
-import '@hedgedoc/codemirror-5/addon/scroll/simplescrollbars.js'
-import '@hedgedoc/codemirror-5/addon/search/jump-to-line.js'
-import '@hedgedoc/codemirror-5/addon/search/match-highlighter.js'
-import '@hedgedoc/codemirror-5/addon/search/matchesonscrollbar.js'
-import '@hedgedoc/codemirror-5/addon/search/search.js'
-import '@hedgedoc/codemirror-5/addon/search/searchcursor.js'
-import '@hedgedoc/codemirror-5/addon/selection/active-line.js'
-import '@hedgedoc/codemirror-5/addon/wrap/hardwrap.js'
-import '@hedgedoc/codemirror-5/keymap/emacs.js'
-import '@hedgedoc/codemirror-5/keymap/sublime.js'
-import '@hedgedoc/codemirror-5/keymap/vim.js'
-import '@hedgedoc/codemirror-5/mode/clike/clike.js'
-import '@hedgedoc/codemirror-5/mode/clojure/clojure.js'
-import '@hedgedoc/codemirror-5/mode/cmake/cmake.js'
-import '@hedgedoc/codemirror-5/mode/coffeescript/coffeescript.js'
-import '@hedgedoc/codemirror-5/mode/css/css.js'
-import '@hedgedoc/codemirror-5/mode/csv/csv.js'
-import '@hedgedoc/codemirror-5/mode/diff/diff.js'
-import '@hedgedoc/codemirror-5/mode/dockerfile/dockerfile.js'
-import '@hedgedoc/codemirror-5/mode/gfm/gfm.js'
-import '@hedgedoc/codemirror-5/mode/gherkin/gherkin.js'
-import '@hedgedoc/codemirror-5/mode/go/go.js'
-import '@hedgedoc/codemirror-5/mode/graphviz/graphviz.js'
-import '@hedgedoc/codemirror-5/mode/groovy/groovy.js'
-import '@hedgedoc/codemirror-5/mode/haskell/haskell.js'
-import '@hedgedoc/codemirror-5/mode/htmlembedded/htmlembedded.js'
-import '@hedgedoc/codemirror-5/mode/htmlmixed/htmlmixed.js'
-import '@hedgedoc/codemirror-5/mode/javascript/javascript.js'
-import '@hedgedoc/codemirror-5/mode/jsx/jsx.js'
-import '@hedgedoc/codemirror-5/mode/lua/lua.js'
-import '@hedgedoc/codemirror-5/mode/markdown/markdown_math.js'
-import '@hedgedoc/codemirror-5/mode/mediawiki/mediawiki.js'
-import '@hedgedoc/codemirror-5/mode/mermaid/mermaid.js'
-import '@hedgedoc/codemirror-5/mode/mllike/mllike.js'
-import '@hedgedoc/codemirror-5/mode/nginx/nginx.js'
-import '@hedgedoc/codemirror-5/mode/perl/perl.js'
-import '@hedgedoc/codemirror-5/mode/php/php.js'
-import '@hedgedoc/codemirror-5/mode/plantuml/plantuml.js'
-import '@hedgedoc/codemirror-5/mode/protobuf/protobuf.js'
-import '@hedgedoc/codemirror-5/mode/pug/pug.js'
-import '@hedgedoc/codemirror-5/mode/python/python.js'
-import '@hedgedoc/codemirror-5/mode/r/r.js'
-import '@hedgedoc/codemirror-5/mode/ruby/ruby.js'
-import '@hedgedoc/codemirror-5/mode/rust/rust.js'
-import '@hedgedoc/codemirror-5/mode/sas/sas.js'
-import '@hedgedoc/codemirror-5/mode/sass/sass.js'
-import '@hedgedoc/codemirror-5/mode/shell/shell.js'
-import '@hedgedoc/codemirror-5/mode/solidity/solidity.js'
-import '@hedgedoc/codemirror-5/mode/sql/sql.js'
-import '@hedgedoc/codemirror-5/mode/stex/stex.js'
-import '@hedgedoc/codemirror-5/mode/swift/swift.js'
-import '@hedgedoc/codemirror-5/mode/tiddlywiki/tiddlywiki.js'
-import '@hedgedoc/codemirror-5/mode/typescript/typescript.js'
-import '@hedgedoc/codemirror-5/mode/vb/vb.js'
-import '@hedgedoc/codemirror-5/mode/verilog/verilog.js'
-import '@hedgedoc/codemirror-5/mode/vhdl/vhdl.js'
-import '@hedgedoc/codemirror-5/mode/xml/xml.js'
-import '@hedgedoc/codemirror-5/mode/yaml-frontmatter/yaml-frontmatter.js'
-import '@hedgedoc/codemirror-5/mode/yaml/yaml.js'
-import '../../../vendor/codemirror-spell-checker/spell-checker.min.js'
-
+/* global inlineAttachment, editor, Cookies  */
 import '../../../vendor/inlineAttachment/inline-attachment'
 import '../../../vendor/inlineAttachment/codemirror.inline-attachment'
 
+import HedgeDocEditor, { MODE_DEFAULT, MODE_SPELLCHECK } from './view'
+import { Pass } from './pass'
 import * as utils from './utils'
 import config from './config'
 import statusBarTemplate from './statusbar.html'
@@ -93,16 +12,12 @@ import toolBarTemplate from './toolbar.html'
 import '../../../css/ui/toolbar.css'
 
 /* config section */
-const isMac = CodeMirror.keyMap.default === CodeMirror.keyMap.macDefault
-const defaultEditorMode = 'gfm'
-const viewportMargin = 20
-
-const jumpToAddressBarKeymapName = isMac ? 'Cmd-L' : 'Ctrl-L'
+const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform)
+const defaultEditorMode = MODE_DEFAULT
 
 export default class Editor {
   constructor () {
     this.editor = null
-    this.jumpToAddressBarKeymapValue = null
     this.defaultExtraKeys = {
       F10: function (cm) {
         cm.setOption('fullScreen', !cm.getOption('fullScreen'))
@@ -111,7 +26,7 @@ export default class Editor {
         if (cm.getOption('fullScreen') && !(cm.getOption('keyMap').substr(0, 3) === 'vim')) {
           cm.setOption('fullScreen', false)
         } else {
-          return CodeMirror.Pass
+          return Pass
         }
       },
       'Cmd-S': function () {
@@ -170,7 +85,7 @@ export default class Editor {
         if (!isMac && cm.getOption('keyMap').substr(0, 3) === 'vim') {
           document.execCommand('copy')
         } else {
-          return CodeMirror.Pass
+          return Pass
         }
       },
       'Ctrl-*': cm => {
@@ -208,13 +123,12 @@ export default class Editor {
   on (event, cb) {
     if (!this.eventListeners[event]) {
       this.eventListeners[event] = [cb]
+      this.editor.on(event, (...args) => {
+        this.eventListeners[event].forEach(cb => cb.bind(this)(...args))
+      })
     } else {
       this.eventListeners[event].push(cb)
     }
-
-    this.editor.on(event, (...args) => {
-      this.eventListeners[event].forEach(cb => cb.bind(this)(...args))
-    })
   }
 
   addToolBar () {
@@ -482,7 +396,6 @@ export default class Editor {
         secure: window.location.protocol === 'https:'
       })
       label.text(keymap)
-      this.restoreOverrideEditorKeymap()
       this.setOverrideBrowserKeymap()
     }
     setKeymapLabel()
@@ -543,7 +456,7 @@ export default class Editor {
     if (cookieSpellcheck) {
       let mode = null
       if (cookieSpellcheck === 'true' || cookieSpellcheck === true) {
-        mode = 'spell-checker'
+        mode = MODE_SPELLCHECK
       } else {
         mode = defaultEditorMode
       }
@@ -566,14 +479,14 @@ export default class Editor {
     spellcheckToggle.click(() => {
       let mode = this.editor.getOption('mode')
       if (mode === defaultEditorMode) {
-        mode = 'spell-checker'
+        mode = MODE_SPELLCHECK
       } else {
         mode = defaultEditorMode
       }
       if (mode && mode !== this.editor.getOption('mode')) {
         this.editor.setOption('mode', mode)
       }
-      Cookies.set('spellcheck', mode === 'spell-checker', {
+      Cookies.set('spellcheck', mode === MODE_SPELLCHECK, {
         expires: 365,
         sameSite: window.cookiePolicy,
         secure: window.location.protocol === 'https:'
@@ -583,39 +496,10 @@ export default class Editor {
     })
 
     checkSpellcheck()
-
-    // workaround spellcheck might not activate beacuse the ajax loading
-    if (window.num_loaded < 2) {
-      const spellcheckTimer = setInterval(
-        () => {
-          if (window.num_loaded >= 2) {
-            if (this.editor.getOption('mode') === 'spell-checker') {
-              this.editor.setOption('mode', 'spell-checker')
-            }
-            clearInterval(spellcheckTimer)
-          }
-        },
-        100
-      )
-    }
   }
 
-  resetEditorKeymapToBrowserKeymap () {
-    const keymap = this.editor.getOption('keyMap')
-    if (!this.jumpToAddressBarKeymapValue) {
-      this.jumpToAddressBarKeymapValue = CodeMirror.keyMap[keymap][jumpToAddressBarKeymapName]
-      delete CodeMirror.keyMap[keymap][jumpToAddressBarKeymapName]
-    }
-  }
-
-  restoreOverrideEditorKeymap () {
-    const keymap = this.editor.getOption('keyMap')
-    if (this.jumpToAddressBarKeymapValue) {
-      CodeMirror.keyMap[keymap][jumpToAddressBarKeymapName] = this.jumpToAddressBarKeymapValue
-      this.jumpToAddressBarKeymapValue = null
-    }
-  }
-
+  // By default Ctrl-L / Cmd-L keeps focusing the browser's address bar. With the preference
+  // "Allow override browser keymap" the editor's own binding (select line) wins instead.
   setOverrideBrowserKeymap () {
     const overrideBrowserKeymap = $(
       '.ui-preferences-override-browser-keymap label > input[type="checkbox"]'
@@ -626,10 +510,10 @@ export default class Editor {
         sameSite: window.cookiePolicy,
         secure: window.location.protocol === 'https:'
       })
-      this.restoreOverrideEditorKeymap()
+      this.editor.setOption('overrideBrowserKeymap', true)
     } else {
       Cookies.remove('preferences-override-browser-keymap')
-      this.resetEditorKeymapToBrowserKeymap()
+      this.editor.setOption('overrideBrowserKeymap', false)
     }
   }
 
@@ -653,40 +537,15 @@ export default class Editor {
   }
 
   init (textit) {
-    this.editor = CodeMirror.fromTextArea(textit, {
-      mode: defaultEditorMode,
-      backdrop: defaultEditorMode,
-      keyMap: 'sublime',
-      viewportMargin,
-      styleActiveLine: true,
-      lineNumbers: true,
-      lineWrapping: true,
-      showCursorWhenSelecting: true,
-      highlightSelectionMatches: true,
-      indentUnit: 4,
-      continueComments: 'Enter',
-      theme: 'one-dark',
-      inputStyle: 'textarea',
-      matchBrackets: true,
-      autoCloseBrackets: true,
-      matchTags: {
-        bothTags: true
-      },
-      autoCloseTags: true,
-      foldGutter: true,
-      gutters: [
-        'CodeMirror-linenumbers',
-        'authorship-gutters',
-        'CodeMirror-foldgutter'
-      ],
-      extraKeys: this.defaultExtraKeys,
-      flattenSpans: true,
-      addModeClass: true,
-      readOnly: true,
-      autoRefresh: true,
-      otherCursors: true,
+    // the editor is added next to the textarea, which only provides the initial content
+    textit.style.display = 'none'
+
+    this.editor = new HedgeDocEditor(textit.parentNode, {
+      value: textit.value,
       placeholder: "← Start by entering a title here\n===\nVisit /features if you don't know what to do.\nHappy hacking :)"
     })
+    this.editor.setOption('indentUnit', 4)
+    this.editor.setOption('extraKeys', this.defaultExtraKeys)
 
     return this.editor
   }

@@ -1,5 +1,17 @@
 # Release Notes
 
+## <i class="fa fa-tag"></i> Unreleased
+
+### Enhancements
+
+- The editor is now based on [CodeMirror 6](https://codemirror.net/) instead of the unmaintained CodeMirror 5. The note editor, the revision viewer, real-time collaboration, authorship colors, the Vim and Emacs keymaps and spell checking keep working as before.
+
+### Changes
+
+- Keyboard shortcuts of the "Sublime" keymap now follow the CodeMirror 6 defaults, so a few less common shortcuts differ from before.
+- The editor uses the native scrollbars of the browser.
+- Matching of HTML tags and automatic closing of HTML tags in the editor are no longer available.
+
 ## <i class="fa fa-tag"></i> 1.12.2 <i class="fa fa-calendar-o"></i> 2026-11-04
 
 ### Bugfixes

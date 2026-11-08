@@ -34,8 +34,7 @@ module.exports = {
       $: 'jquery',
       jQuery: 'jquery',
       'window.jQuery': 'jquery',
-      'moment': 'moment',
-      CodeMirror: '@hedgedoc/codemirror-5/lib/codemirror.js'
+      'moment': 'moment'
     }),
     new HtmlWebpackPlugin({
       template: 'public/views/includes/header.ejs',
@@ -186,17 +185,6 @@ module.exports = {
       path.join(__dirname, 'public/js/index.js')
     ],
     'index-styles': [
-      path.join(__dirname, 'public/vendor/codemirror-spell-checker/spell-checker.min.css'),
-      path.join(__dirname, 'node_modules/@hedgedoc/codemirror-5/lib/codemirror.css'),
-      path.join(__dirname, 'node_modules/@hedgedoc/codemirror-5/addon/fold/foldgutter.css'),
-      path.join(__dirname, 'node_modules/@hedgedoc/codemirror-5/addon/display/fullscreen.css'),
-      path.join(__dirname, 'node_modules/@hedgedoc/codemirror-5/addon/dialog/dialog.css'),
-      path.join(__dirname, 'node_modules/@hedgedoc/codemirror-5/addon/scroll/simplescrollbars.css'),
-      path.join(__dirname, 'node_modules/@hedgedoc/codemirror-5/addon/search/matchesonscrollbar.css'),
-      path.join(__dirname, 'node_modules/@hedgedoc/codemirror-5/theme/monokai.css'),
-      path.join(__dirname, 'node_modules/@hedgedoc/codemirror-5/theme/one-dark.css'),
-      path.join(__dirname, 'node_modules/@hedgedoc/codemirror-5/mode/tiddlywiki/tiddlywiki.css'),
-      path.join(__dirname, 'node_modules/@hedgedoc/codemirror-5/mode/mediawiki/mediawiki.css'),
       path.join(__dirname, 'node_modules/spin.js/spin.css'),
       path.join(__dirname, 'public/css/github-extract.css'),
       path.join(__dirname, 'public/vendor/showup/showup.css'),
@@ -319,24 +307,16 @@ module.exports = {
         test: [
           // webpack 4 understands no module syntax
           /\.mjs$/,
-          // mermaid and markdown-it use modern syntax not supported by webpack 4
+          // mermaid, markdown-it and the vim keymap use modern syntax not supported by webpack 4
           /[\\/]node_modules[\\/]mermaid[\\/].*\.js$/,
-          /[\\/]node_modules[\\/]markdown-it[\\/].*\.js$/
+          /[\\/]node_modules[\\/]markdown-it[\\/].*\.js$/,
+          /[\\/]node_modules[\\/]@replit[\\/].*\.js$/
         ],
         type: 'javascript/auto',
         loader: 'esbuild-loader',
         options: {
           // Compile down for our babel tooling
           target: 'es2015'
-        }
-      },
-      {
-        test: require.resolve(path.join(__dirname, 'public/vendor/codemirror-spell-checker/spell-checker.min.js')),
-        use: {
-          loader: 'imports-loader',
-          options: {
-            imports: ['default @hedgedoc/codemirror-5 CodeMirror']
-          }
         }
       },
       {

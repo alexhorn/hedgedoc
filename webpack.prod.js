@@ -18,6 +18,10 @@ module.exports = [
         new EsbuildPlugin({
           target: 'es2015',
           format: 'cjs',
+          // @replit/codemirror-emacs marks the calls that register its key bindings and commands
+          // as `@__PURE__`. They are only there for their side effects, so the minifier must not
+          // drop them because their result is unused (which would leave the emacs keymap empty).
+          ignoreAnnotations: true,
           exclude: ['MathJax/extensions/a11y/mathmaps', 'reveal.js/plugin/markdown/marked.js', 'constrain-object.min.js']
         })
       ],

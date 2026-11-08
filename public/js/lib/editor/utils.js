@@ -1,9 +1,10 @@
-/* global CodeMirror, editor  */
+/* global editor  */
+import { Pass } from './pass'
 const wrapSymbols = ['*', '_', '~', '^', '+', '=']
 
 export function wrapTextWith (editor, cm, symbol) {
   if (!cm.getSelection()) {
-    return CodeMirror.Pass
+    return Pass
   } else {
     const ranges = cm.listSelections()
     for (let i = 0; i < ranges.length; i++) {

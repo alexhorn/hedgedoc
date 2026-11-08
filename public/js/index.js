@@ -3,7 +3,6 @@
    key, Dropbox, Visibility */
 
 import TurndownService from 'turndown'
-import CodeMirror from '@hedgedoc/codemirror-5/lib/codemirror.js'
 
 import 'jquery-ui/ui/widgets/resizable'
 import 'jquery-ui/themes/base/resizable.css'
@@ -13,6 +12,8 @@ import Idle from 'Idle.Js'
 import '../vendor/jquery-textcomplete/jquery.textcomplete'
 
 import { ot } from '../vendor/ot/ot.min.js'
+import CodeMirrorAdapter from './lib/editor/ot-adapter'
+import HedgeDocEditor from './lib/editor/view'
 import hex2rgb from '../vendor/ot/hex2rgb'
 
 import { saveAs } from 'file-saver'
@@ -98,7 +99,6 @@ require('./fix-aria-hidden-for-modals')
 
 let defaultTextHeight = 20
 let viewportMargin = 20
-const defaultEditorMode = 'gfm'
 
 const idleTime = 300000 // 5 mins
 const updateViewDebounce = 100
@@ -1432,8 +1432,8 @@ ui.modal.revision.on('show.bs.modal', function (e) {
 })
 function checkRevisionViewer () {
   if (revisionViewer) {
-    const container = $(revisionViewer.display.wrapper).parent()
-    $(revisionViewer.display.scroller).css('height', container.height() + 'px')
+    const container = $(revisionViewer.getWrapperElement()).parent()
+    $(revisionViewer.getScrollerElement()).css('height', container.height() + 'px')
     revisionViewer.refresh()
   }
 }
@@ -1554,20 +1554,12 @@ function selectRevision (time) {
 function initRevisionViewer () {
   if (revisionViewer) return
   const revisionViewerTextArea = document.getElementById('revisionViewer')
-  revisionViewer = CodeMirror.fromTextArea(revisionViewerTextArea, {
-    mode: defaultEditorMode,
-    viewportMargin,
-    lineNumbers: true,
-    lineWrapping: true,
-    showCursorWhenSelecting: true,
-    inputStyle: 'textarea',
-    gutters: ['CodeMirror-linenumbers'],
-    flattenSpans: true,
-    addModeClass: true,
-    readOnly: true,
-    autoRefresh: true,
-    scrollbarStyle: 'overlay'
+  // like the main editor, the viewer is added next to the textarea, which stays hidden
+  revisionViewer = new HedgeDocEditor(revisionViewerTextArea.parentNode, {
+    value: revisionViewerTextArea.value,
+    full: false
   })
+  revisionViewer.setOption('theme', 'default')
   revisionInsertAnnotation = revisionViewer.annotateScrollbar({
     className: 'CodeMirror-insert-match'
   })
@@ -2024,7 +2016,7 @@ function replaceAll (data) {
     },
     {
       line: editor.lastLine(),
-      ch: editor.lastLine().length
+      ch: editor.getLine(editor.lastLine()).length
     },
     '+input'
   )
@@ -2316,7 +2308,6 @@ socket.on('version', function (data) {
 let authors = []
 let authorship = []
 let authorMarks = {} // temp variable
-let addTextMarkers = [] // temp variable
 function updateInfo (data) {
   // console.debug(data);
   if (
@@ -2495,97 +2486,45 @@ function updateAuthorshipInner () {
       }
     }
   }
-  addTextMarkers = []
-  editor.eachLine(iterateLine)
-  const allTextMarks = editor.getAllMarks()
-  for (let i = 0; i < allTextMarks.length; i++) {
-    const _textMarker = allTextMarks[i]
-    const pos = _textMarker.find()
-    let found = false
-    for (let j = 0; j < addTextMarkers.length; j++) {
-      const textMarker = addTextMarkers[j]
-      const author = authors[textMarker.userid]
-      const className = 'authorship-inline-' + author.color.substr(1)
-      const obj = {
-        from: textMarker.pos[0],
-        to: textMarker.pos[1]
-      }
-      if (
-        JSON.stringify(pos) === JSON.stringify(obj) &&
-        _textMarker.className &&
-        _textMarker.className.indexOf(className) > -1
-      ) {
-        addTextMarkers.splice(j, 1)
-        j--
-        found = true
-        break
-      }
-    }
-    if (
-      !found &&
-      _textMarker.className &&
-      _textMarker.className.indexOf('authorship-inline') > -1
-    ) {
-      _textMarker.clear()
-    }
-  }
-  for (let i = 0; i < addTextMarkers.length; i++) {
-    const textMarker = addTextMarkers[i]
-    const author = authors[textMarker.userid]
-    const rgbcolor = hex2rgb(author.color)
-    const colorString = `rgba(${rgbcolor.red},${rgbcolor.green},${rgbcolor.blue},0.7)`
-    const styleString = `background-image: linear-gradient(to top, ${colorString} 1px, transparent 1px);`
-    const className = `authorship-inline-${author.color.substr(1)}`
-    const rule = `.${className} { ${styleString} }`
-    addStyleRule(rule)
-    editor.markText(textMarker.pos[0], textMarker.pos[1], {
-      className: 'authorship-inline ' + className,
-      title: author.name
-    })
-  }
-}
-function iterateLine (line) {
-  const lineNumber = line.lineNo()
-  const currMark = authorMarks[lineNumber]
-  const author = currMark ? authors[currMark.gutter.userid] : null
-  if (currMark && author) {
-    const className = 'authorship-gutter-' + author.color.substr(1)
-    const gutters = line.gutterMarkers
-    if (
-      !gutters ||
-      !gutters['authorship-gutters'] ||
-      !gutters['authorship-gutters'].className ||
-      !gutters['authorship-gutters'].className.indexOf(className) < 0
-    ) {
+  const gutterMarks = []
+  const inlineMarks = []
+  Object.keys(authorMarks).forEach(function (key) {
+    const lineNumber = parseInt(key)
+    const currMark = authorMarks[lineNumber]
+    const author = authors[currMark.gutter.userid]
+    if (author) {
+      const className = 'authorship-gutter-' + author.color.substr(1)
       const styleString = `border-left: 3px solid ${author.color}; height: ${defaultTextHeight}px; margin-left: 3px;`
-      const rule = `.${className} { ${styleString} }`
-      addStyleRule(rule)
-      const gutter = $('<div>', {
-        class: 'authorship-gutter ' + className,
-        title: author.name
+      addStyleRule(`.${className} { ${styleString} }`)
+      gutterMarks.push({ line: lineNumber, className, name: author.name })
+    }
+    currMark.textmarkers.forEach(function (textMarker) {
+      // only passages of other authors than the one of the line get their own mark
+      if (textMarker.userid === currMark.gutter.userid) return
+      const markAuthor = authors[textMarker.userid]
+      const rgbcolor = hex2rgb(markAuthor.color)
+      const colorString = `rgba(${rgbcolor.red},${rgbcolor.green},${rgbcolor.blue},0.7)`
+      const styleString = `background-image: linear-gradient(to top, ${colorString} 1px, transparent 1px);`
+      const className = `authorship-inline-${markAuthor.color.substr(1)}`
+      addStyleRule(`.${className} { ${styleString} }`)
+      inlineMarks.push({
+        from: textMarker.pos[0],
+        to: textMarker.pos[1],
+        className,
+        name: markAuthor.name
       })
-      editor.setGutterMarker(line, 'authorship-gutters', gutter[0])
-    }
-  } else {
-    editor.setGutterMarker(line, 'authorship-gutters', null)
-  }
-  if (currMark && currMark.textmarkers.length > 0) {
-    for (let i = 0; i < currMark.textmarkers.length; i++) {
-      const textMarker = currMark.textmarkers[i]
-      if (textMarker.userid !== currMark.gutter.userid) {
-        addTextMarkers.push(textMarker)
-      }
-    }
-  }
+    })
+  })
+  editor.setAuthorship({ lines: gutterMarks, inline: inlineMarks })
 }
 editorInstance.on('update', function () {
   $('.authorship-gutter:not([data-original-title])').tooltip({
-    container: '.CodeMirror-lines',
+    container: 'body',
     placement: 'right',
     delay: { show: 500, hide: 100 }
   })
   $('.authorship-inline:not([data-original-title])').tooltip({
-    container: '.CodeMirror-lines',
+    container: 'body',
     placement: 'bottom',
     delay: { show: 500, hide: 100 }
   })
@@ -2649,7 +2588,6 @@ socket.on('refresh', function (data) {
 
 const EditorClient = ot.EditorClient
 const SocketIOAdapter = ot.SocketIOAdapter
-const CodeMirrorAdapter = ot.CodeMirrorAdapter
 let cmClient = null
 let synchronized_ = null
 
@@ -3057,7 +2995,8 @@ function checkCursorTag (coord, ele) {
   const left = coord.left
   const top = coord.top
   // get doc top offset (to workaround with viewport)
-  const docTopOffset = ui.area.codemirrorSizerInner.position().top
+  // the coordinates of the editor are relative to the top of the document, not to the viewport
+  const docTopOffset = 0
   // set offset
   let offsetLeft = -3
   let offsetTop = defaultTextHeight
@@ -3803,7 +3742,8 @@ function checkCursorMenuInner () {
   const left = coord.left
   const top = coord.top
   // get doc top offset (to workaround with viewport)
-  const docTopOffset = ui.area.codemirrorSizerInner.position().top
+  // the coordinates of the editor are relative to the top of the document, not to the viewport
+  const docTopOffset = 0
   // set offset
   let offsetLeft = 0
   let offsetTop = defaultTextHeight
@@ -4158,7 +4098,10 @@ $(editor.getInputField())
       }
     ],
     {
-      appendTo: $('.cursor-menu')
+      appendTo: $('.cursor-menu'),
+      // The input field of the editor is contenteditable, for which the library would
+      // choose an adapter that edits the DOM directly. Changes have to go through the editor.
+      adapter: $.fn.textcomplete.Textarea
     }
   )
   .on({

@@ -35,13 +35,15 @@ body:not(.night) .night {
   padding: 6px;
 }
 
+/* The editor is CodeMirror 6. Its root element carries the class `CodeMirror` and the
+   scroller `CodeMirror-scroll` (set in lib/editor/view.js) so that the layout code can
+   address them. */
 .CodeMirror {
     font-family: "Source Code Pro", Consolas, monaco, monospace;
     letter-spacing: 0.025em;
     line-height: 1.25;
     font-size: 18px;
     height: auto !important;
-    overflow-y: hidden !important;
     -webkit-overflow-scrolling: touch;
 }
 /* support japanese font */
@@ -56,30 +58,37 @@ body:not(.night) .night {
 .CodeMirror[lang="zh-cn"] {
     font-family: "Source Code Pro", Consolas, monaco, "Microsoft YaHei", "微软雅黑", monospace;
 }
-.CodeMirror-placeholder {
-    color: #777 !important;
+.CodeMirror.cm-editor.cm-focused {
+    outline: none;
 }
 .CodeMirror-scroll {
     overflow-x: hidden !important;
     overflow-y: auto !important;
 }
-.CodeMirror-code {
-    margin-bottom: 36px;
-}
-.CodeMirror-gutter-elt {
+.CodeMirror .cm-gutterElement {
     text-align: center;
 }
-.CodeMirror-linenumber {
-/*    opacity: 0.5;*/
-    min-width: 1.5em;
-    text-align: right;
-}
-.CodeMirror-gutter.authorship-gutters {
+.CodeMirror .cm-gutter.authorship-gutters {
     width: 8px;
 }
-.CodeMirror-matchingtag {
-    background: rgba(255, 255, 255, .1);
-    line-height: 1em;
+/* tool bar and status bar are panels, which come with their own look */
+.CodeMirror .cm-panels {
+    background-color: transparent;
+    border: none;
+    color: inherit;
+    font-family: inherit;
+    letter-spacing: normal;
+    line-height: normal;
+}
+.CodeMirror .cm-panels-top,
+.CodeMirror .cm-panels-bottom {
+    border: none;
+}
+.CodeMirror .cm-panels > .cm-panel {
+    padding: 0;
+}
+.CodeMirror .cm-spell-error {
+    border-bottom: 2px dotted rgba(255, 0, 0, .8);
 }
 .CodeMirror-foldmarker {
     color: #d0d0d0;
@@ -90,11 +99,6 @@ body:not(.night) .night {
     cursor: pointer;
     margin: 2px;
     padding-bottom: 2px;
-}
-.CodeMirror-foldgutter {
-    /*width: 1em;*/
-    cursor: default;
-    line-height: 100%;
 }
 .CodeMirror-foldgutter-open,
 .CodeMirror-foldgutter-folded {
@@ -110,7 +114,6 @@ body:not(.night) .night {
 .CodeMirror-foldgutter-open:after {
     content: "⌵";
     font-size: 1em;
-/*    opacity: 0.5;*/
 }
 .CodeMirror-foldgutter-folded:after {
     content: "+";
@@ -120,11 +123,54 @@ body:not(.night) .night {
 .CodeMirror-foldmarker, .CodeMirror-foldgutter-folded:after {
     color: #78B2F2 !important;
 }
-.CodeMirror-sizer {
-    /* Make sure CodeMirror doesn't hide text under the status bar
-     * 26px is the height of the status bar.
-     */
-    margin-bottom: 26px !important;
+/* CodeMirror declares `position: relative !important` for its root element, so this
+   needs `!important` as well */
+.CodeMirror.CodeMirror-fullscreen {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9;
+}
+.CodeMirror-fullscreen .CodeMirror-scroll {
+    height: auto !important;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+/* Elements placed in text coordinates: cursors of other users and the completion menu.
+   The overlay does not take any space and does not capture any mouse events itself. */
+.CodeMirror-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 3;
+}
+.CodeMirror-overlay .CodeMirror-other-cursor,
+.CodeMirror-overlay .dropdown-menu {
+    pointer-events: auto;
+}
+.CodeMirror-other-cursor {
+    width: 0px;
+    position: absolute;
+    border-right: none;
+}
+.CodeMirror-annotation-track {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 10px;
+    pointer-events: none;
+}
+.CodeMirror-annotation-track > div {
+    position: absolute;
+    left: 0;
+    right: 0;
 }
 .CodeMirror-insert-match {
   background: lawngreen;
@@ -374,9 +420,6 @@ div[contenteditable]:empty:not(:focus):before{
     overflow: auto;
     margin-bottom: 30px;
 }
-.CodeMirror-scrollbar-filler {
-    background: inherit;
-}
 
 .night .navbar .btn-default,
 .night .close {
@@ -453,11 +496,7 @@ div[contenteditable]:empty:not(:focus):before{
   content: '↵';
 }
 
-.cm-matchhighlight {
-/*    border-radius: 5px;*/
-/*    box-shadow: 0 1px 0 0 #ccc;*/
-    border-bottom: 1px solid #ccc;
-}
+
 
 .snippet-import-or {
     text-align: center;
