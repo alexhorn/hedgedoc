@@ -512,7 +512,17 @@ export default class HedgeDocEditor {
       case 'anchor': return posFromIndexIn(doc, range.anchor)
       case 'from': return posFromIndexIn(doc, range.from)
       case 'to': return posFromIndexIn(doc, range.to)
-      default: return posFromIndexIn(doc, range.head)
+      default: {
+        // CodeMirror 5 returned the same object for as long as the cursor stayed where it was,
+        // and jquery-textcomplete relies on that: it compares the object to the previous one to
+        // find out whether the cursor has moved. A new object every time would make it search
+        // again on every key (for example reopen the menu after Escape).
+        const cache = this.cursorCache
+        if (cache && cache.doc === doc && cache.head === range.head) return cache.pos
+        const pos = posFromIndexIn(doc, range.head)
+        this.cursorCache = { doc, head: range.head, pos }
+        return pos
+      }
     }
   }
 
