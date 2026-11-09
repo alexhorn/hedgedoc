@@ -881,10 +881,13 @@ export default class HedgeDocEditor {
       const handler = extraKeys[name]
       bindings.push({
         key: convertKeyName(name),
+        // Returning false (handler passed) must leave the key to the browser, so that for example
+        // Ctrl-C still copies. There must be no `preventDefault: true` here, it would cancel the
+        // browser's action even when the command did not handle the key. A handled key is
+        // prevented anyway.
         run: () => typeof handler === 'string'
           ? this.execCommand(handler)
-          : handler(this) !== Pass,
-        preventDefault: true
+          : handler(this) !== Pass
       })
     })
     this._reconfigure('extraKeys', Prec.highest(keymap.of(bindings)))
