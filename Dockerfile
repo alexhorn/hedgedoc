@@ -19,6 +19,9 @@
 # file rebuilds the frontend and the last stage. Dependencies are only installed again when the
 # lock file changes.
 #
+# HedgeDoc links to the sources of the version it runs. When running a fork, set CMD_SOURCE_URL at
+# runtime (for example https://github.com/<owner>/hedgedoc/tree/<branch>), no rebuild is needed.
+#
 # The helper files in docker/ are taken from the official container build
 # (https://github.com/hedgedoc/container). Configure the container with CMD_* environment
 # variables, see https://docs.hedgedoc.org/configuration/
@@ -127,13 +130,6 @@ RUN ln -s /files/config.json /hedgedoc/config.json
 # so the commit can be passed in. This comes last because it changes with every commit.
 ARG GIT_COMMIT
 RUN if [ -n "${GIT_COMMIT}" ]; then mkdir -p /hedgedoc/.git && echo "${GIT_COMMIT}" > /hedgedoc/.git/HEAD; fi
-
-# Optional. URL of the repository the sources are published at, if it is not the one in package.json.
-# The source URL of a running instance can also be set with CMD_SOURCE_URL.
-ARG HEDGEDOC_REPOSITORY
-RUN if [ -n "${HEDGEDOC_REPOSITORY}" ]; then \
-      sed -i "s|\"url\": \"https://github.com/hedgedoc/hedgedoc.git\"|\"url\": \"${HEDGEDOC_REPOSITORY}\"|" /hedgedoc/package.json; \
-    fi
 
 HEALTHCHECK --interval=15s CMD node healthcheck.mjs
 
